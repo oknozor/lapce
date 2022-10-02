@@ -93,6 +93,7 @@ all-languages = [
     "lang-wgsl",
     "lang-yaml",
     "lang-zig",
+    "lang-just",
 ]
 
 lang-bash = ["lapce-core/lang-bash"]
@@ -138,3 +139,4 @@ lang-vue = ["lapce-core/lang-vue"]
 lang-wgsl = ["lapce-core/lang-wgsl"]
 lang-yaml = ["lapce-core/lang-yaml"]
 lang-zig = ["lapce-core/lang-zig"]
+lang-just = ["lapce-core/lang-just"]

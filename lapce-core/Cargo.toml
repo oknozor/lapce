@@ -68,6 +68,7 @@ tree-sitter-vue = { version = "0.0.3", optional = true }
 tree-sitter-wgsl = { git = "https://github.com/szebniok/tree-sitter-wgsl", branch = "master", optional = true }
 tree-sitter-yaml = { git = "https://github.com/panekj/tree-sitter-yaml", branch = "master", optional = true }
 tree-sitter-zig = { git = "https://github.com/maxxnino/tree-sitter-zig", branch = "main", optional = true }
+tree-sitter-just = { path = "../../tree-sitter-just", optional = true }
 
 [features]
 default = []
@@ -117,3 +118,5 @@ lang-vue = ["dep:tree-sitter-vue"]
 lang-wgsl = ["dep:tree-sitter-wgsl"]
 lang-yaml = ["dep:tree-sitter-yaml"]
 lang-zig = ["dep:tree-sitter-zig"]
+lang-just = ["dep:tree-sitter-just"]
+

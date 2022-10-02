@@ -2546,6 +2546,7 @@ dependencies = [
  "tree-sitter-javascript",
  "tree-sitter-json",
  "tree-sitter-julia",
+ "tree-sitter-just",
  "tree-sitter-kotlin",
  "tree-sitter-latex",
  "tree-sitter-lua",
@@ -5036,6 +5037,14 @@ dependencies = [
 name = "tree-sitter-julia"
 version = "0.19.0"
 source = "git+https://github.com/varlad/tree-sitter-julia?branch=master#eff3e0f57512ecb2e72024732d66dba64bdeaecf"
+dependencies = [
+ "cc",
+ "tree-sitter",
+]
+
+[[package]]
+name = "tree-sitter-just"
+version = "0.0.1"
 dependencies = [
  "cc",
  "tree-sitter",

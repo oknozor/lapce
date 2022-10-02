@@ -100,6 +100,7 @@ declare_language_highlights!(
     Wgsl: "lang-wgsl",
     Yaml: "lang-yaml",
     Zig: "lang-zig",
+    Just: "lang-just",
 );
 
 /// Indicates which highlight should be applied to a region of source code.

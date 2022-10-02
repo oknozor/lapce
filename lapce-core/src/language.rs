@@ -21,7 +21,7 @@ use crate::syntax::highlight::HighlightConfiguration;
 //
 //    [features]
 //    # ...
-//    lang-foo = "dep:tree-sitter-foo"
+//    lang-foo = ["dep:tree-sitter-foo"]
 //
 // 3. Add a new variant to `LapceLanguage`, say Foo, following the existing
 //    variants, guard the new variant with the new feature.
@@ -50,7 +50,7 @@ use crate::syntax::highlight::HighlightConfiguration;
 //        },
 //    ];
 //
-// 5. In `syntax.rs`, add `Foo: "lang-foo",` to the list in the
+// 5. In `highlight.rs`, add `Foo: "lang-foo",` to the list in the
 //    `declare_language_highlights` macro.
 //
 // 6. Add a new feature, say "lang-foo", to the lapce-ui crate (see
@@ -204,6 +204,8 @@ pub enum LapceLanguage {
     Yaml,
     #[cfg(feature = "lang-zig")]
     Zig,
+    #[cfg(feature = "lang-just")]
+    Just,
 }
 
 // NOTE: Elements in the array must be in the same order as the enum variants of
@@ -802,6 +804,18 @@ const LANGUAGES: &[SyntaxProperties] = &[
         code_lens: (DEFAULT_CODE_LENS_LIST, DEFAULT_CODE_LENS_IGNORE_LIST),
         sticky_headers: &[],
         extensions: &["zig"],
+    },
+    #[cfg(feature = "lang-just")]
+    SyntaxProperties {
+        id: LapceLanguage::Just,
+        language: tree_sitter_just::language,
+        highlight: include_str!("../queries/just/highlights.scm"),
+        injection: None,
+        comment: "#",
+        indent: "    ",
+        code_lens: (DEFAULT_CODE_LENS_LIST, DEFAULT_CODE_LENS_IGNORE_LIST),
+        sticky_headers: &[],
+        extensions: &[],
     },
 ];
 
