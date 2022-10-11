@@ -1581,12 +1581,24 @@ impl LapceTab {
                     } => {
                         if let Some(doc) = data.main_split.open_docs.get_mut(path) {
                             if doc.rev() == *rev {
+                                println!("{resp:#?}");
                                 Arc::make_mut(doc)
                                     .code_actions
                                     .insert(*offset, (*plugin_id, resp.clone()));
                             }
                         }
                     }
+
+                    LapceUICommand::UpdateCodeLens {
+                        path,
+                        plugin_id,
+                        resp,
+                    } => {
+                        let doc = data.main_split.open_docs.get_mut(path).unwrap();
+                        let doc = Arc::make_mut(doc);
+                        doc.code_lenses.insert(*plugin_id, resp.clone());
+                    }
+
                     LapceUICommand::PaletteReferences(offset, locations) => {
                         if let Some(editor) = data.main_split.active_editor() {
                             if *offset == editor.cursor.offset() {

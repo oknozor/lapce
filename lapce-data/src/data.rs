@@ -600,6 +600,7 @@ pub struct LapceTabData {
     pub title: Arc<TitleData>,
     pub main_split: LapceMainSplitData,
     pub completion: Arc<CompletionData>,
+    // pub lenses: Arc<CodeLensData>,
     pub hover: Arc<HoverData>,
     pub rename: Arc<RenameData>,
     pub terminal: Arc<TerminalSplitData>,

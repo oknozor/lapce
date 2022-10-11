@@ -24,7 +24,7 @@ use lapce_rpc::{
 use lsp_types::{
     CodeActionOrCommand, CodeActionResponse, CompletionItem, CompletionResponse,
     InlayHint, Location, MessageType, Position, ProgressParams,
-    PublishDiagnosticsParams, SelectionRange, TextEdit, WorkspaceEdit,
+    PublishDiagnosticsParams, SelectionRange, TextEdit, WorkspaceEdit, CodeLens,
 };
 use serde_json::Value;
 use strum::{self, EnumMessage, IntoEnumIterator};
@@ -559,6 +559,11 @@ pub enum LapceUICommand {
         rev: u64,
         offset: usize,
         resp: CodeActionResponse,
+    },
+    UpdateCodeLens {
+        path: PathBuf,
+        plugin_id: PluginId,
+        resp: Vec<CodeLens>,
     },
     CancelPalette,
     RunCommand(String, Vec<String>),

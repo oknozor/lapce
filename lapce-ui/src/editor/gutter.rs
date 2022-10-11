@@ -11,6 +11,7 @@ use lapce_data::{
     data::{EditorView, LapceTabData},
     editor::{LapceEditorBufferData, Syntax},
 };
+use lsp_types::CodeLens;
 
 use crate::svg::get_svg;
 
@@ -481,6 +482,26 @@ impl LapceEditorGutter {
         }
     }
 
+    fn code_lens_rect(
+        &self,
+        code_lens: &CodeLens,
+        text: &mut PietText,
+        data: &LapceEditorBufferData,
+    ) -> Rect {
+        let line_height = data.config.editor.line_height() as f64;
+        let offset = data.doc.buffer().offset_of_position(&code_lens.range.start);
+        let (line, _) = data.doc.buffer().offset_to_line_col(offset);
+
+        let width = 16.0;
+        let height = 16.0;
+        let char_width = data.config.editor_char_width(text);
+        Size::new(width, height).to_rect().with_origin(Point::new(
+            self.width + char_width + 3.0,
+            (line_height - height) / 2.0 + line_height * line as f64
+                - data.editor.scroll_offset.y,
+        ))
+    }
+
     fn code_actions_rect(
         &self,
         text: &mut PietText,
@@ -515,6 +536,25 @@ impl LapceEditorGutter {
                     Some(data.config.get_color_unchecked(LapceTheme::LAPCE_WARN)),
                 );
             }
+        }
+    }
+
+    // TODO
+    fn paint_lsp_code_lens_hint(
+        &self,
+        data: &LapceEditorBufferData,
+        ctx: &mut PaintCtx,
+    ) {
+        let lenses = data.code_lens();
+        println!("{:?}", lenses.len());
+        for (_plugin_id, lens) in lenses {
+            let svg = get_svg("triangle-right.svg").unwrap();
+            let rect = self.code_lens_rect(lens, ctx.text(), data);
+            ctx.draw_svg(
+                &svg,
+                rect,
+                Some(data.config.get_color_unchecked(LapceTheme::TERMINAL_GREEN)),
+            );
         }
     }
 
@@ -617,12 +657,7 @@ impl LapceEditorGutter {
                 let line_no = if sequential_line_numbers || line == current_line {
                     line + 1
                 } else {
-                    // TODO: after Rust 1.60, this can be replaced with `line.abs_diff(current_line)`
-                    if line > current_line {
-                        line - current_line
-                    } else {
-                        current_line - line
-                    }
+                    line.abs_diff(current_line)
                 };
 
                 let content = line_no.to_string();
@@ -736,6 +771,8 @@ impl LapceEditorGutter {
                     last_change = Some(change);
                 }
             }
+
+            self.paint_lsp_code_lens_hint(data, ctx);
 
             if *data.main_split.active == Some(self.view_id) {
                 self.paint_code_actions_hint(data, ctx);

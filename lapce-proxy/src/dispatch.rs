@@ -363,6 +363,16 @@ impl ProxyHandler for Dispatcher {
                     },
                 );
             }
+            GetCodeLens { path } => {
+                let proxy_rpc = self.proxy_rpc.clone();
+                self.catalog_rpc.code_lenses(&path, move |plugin_id, result| {
+                    let result = result.map(|items| ProxyResponse::CodeLensResponse {
+                        items,
+                        plugin_id,
+                    });
+                    proxy_rpc.handle_response(id, result);
+                });
+            }
             GetHover {
                 request_id,
                 path,

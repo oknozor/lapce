@@ -25,7 +25,7 @@ use lapce_rpc::{
     style::LineStyle,
     RequestId, RpcError,
 };
-use lsp_types::request::CodeActionResolveRequest;
+use lsp_types::{request::{CodeActionResolveRequest, CodeLensRequest}, CodeLens, CodeLensParams};
 use lsp_types::{
     request::{
         CodeActionRequest, Completion, DocumentSymbolRequest, Formatting,
@@ -700,6 +700,31 @@ impl PluginCatalogRpcHandler {
         };
         let language_id =
             Some(language_id_from_path(path).unwrap_or("").to_string());
+        self.send_request_to_all_plugins(
+            method,
+            params,
+            language_id,
+            Some(path.to_path_buf()),
+            cb,
+        );
+    }
+    
+    pub fn code_lenses(
+        &self,
+        path: &Path,
+        cb: impl FnOnce(PluginId, Result<Vec<CodeLens>, RpcError>) + Clone + Send + 'static,
+    ) {
+        let uri = Url::from_file_path(path).unwrap();
+        let method = CodeLensRequest::METHOD;
+        let params = CodeLensParams {
+            text_document: TextDocumentIdentifier { uri },
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+        };
+        
+        let language_id =
+            Some(language_id_from_path(path).unwrap_or("").to_string());
+
         self.send_request_to_all_plugins(
             method,
             params,

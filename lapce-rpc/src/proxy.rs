@@ -12,7 +12,7 @@ use lsp_types::{
     request::GotoTypeDefinitionResponse, CodeAction, CodeActionResponse,
     CompletionItem, DocumentSymbolResponse, GotoDefinitionResponse, Hover,
     InlayHint, Location, Position, PrepareRenameResponse, SelectionRange,
-    SymbolInformation, TextDocumentItem, TextEdit, WorkspaceEdit,
+    SymbolInformation, TextDocumentItem, TextEdit, WorkspaceEdit, CodeLens,
 };
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
@@ -42,7 +42,7 @@ pub enum ProxyRequest {
     NewBuffer {
         buffer_id: BufferId,
         path: PathBuf,
-    },
+    }, 
     BufferHead {
         path: PathBuf,
     },
@@ -57,6 +57,9 @@ pub enum ProxyRequest {
     CodeActionResolve {
         plugin_id: PluginId,
         action_item: Box<CodeAction>,
+    },
+    GetCodeLens {
+        path: PathBuf
     },
     GetHover {
         request_id: usize,
@@ -243,6 +246,10 @@ pub enum ProxyResponse {
     },
     CodeActionResolveResponse {
         item: Box<CodeAction>,
+    },
+    CodeLensResponse {
+        plugin_id: PluginId,
+        items: Vec<CodeLens>,
     },
     HoverResponse {
         request_id: usize,
@@ -638,6 +645,19 @@ impl ProxyRpcHandler {
             ProxyRequest::CodeActionResolve {
                 action_item: Box::new(action_item),
                 plugin_id,
+            },
+            f,
+        );
+    }
+    
+    pub fn get_code_lense(
+        &self,
+        path: PathBuf,
+        f: impl ProxyCallback + 'static,
+    ) {
+        self.request_async(
+            ProxyRequest::GetCodeLens {
+                path,
             },
             f,
         );

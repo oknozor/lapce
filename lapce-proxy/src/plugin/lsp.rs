@@ -305,6 +305,9 @@ impl LspClient {
                     }),
                     ..Default::default()
                 }),
+                code_lens: Some(CodeLensClientCapabilities {
+                    dynamic_registration: Some(false),
+                }),
                 hover: Some(HoverClientCapabilities {
                     content_format: Some(vec![
                         MarkupKind::Markdown,

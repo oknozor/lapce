@@ -34,7 +34,7 @@ use lapce_rpc::{
 };
 use lsp_types::{
     CodeActionOrCommand, CodeActionResponse, DiagnosticSeverity, InlayHint,
-    InlayHintLabel,
+    InlayHintLabel, CodeLens,
 };
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
@@ -353,6 +353,7 @@ pub struct Document {
     pub cursor_offset: usize,
     pub scroll_offset: Vec2,
     pub code_actions: im::HashMap<usize, (PluginId, CodeActionResponse)>,
+    pub code_lenses: im::HashMap<PluginId, Vec<CodeLens>>,    
     pub inlay_hints: Option<Spans<InlayHint>>,
     pub diagnostics: Option<Arc<Vec<EditorDiagnostic>>>,
     ime_text: Option<Arc<String>>,
@@ -398,6 +399,7 @@ impl Document {
             cursor_offset: 0,
             scroll_offset: Vec2::ZERO,
             code_actions: im::HashMap::new(),
+            code_lenses: im::HashMap::new(),
             inlay_hints: None,
             diagnostics: None,
             ime_text: None,

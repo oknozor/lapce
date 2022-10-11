@@ -30,9 +30,10 @@ use lapce_rpc::plugin::PluginId;
 use lapce_rpc::proxy::ProxyResponse;
 use lsp_types::{
     request::GotoTypeDefinitionResponse, CodeAction, CodeActionOrCommand,
-    CodeActionResponse, CompletionItem, CompletionTextEdit, DiagnosticSeverity,
-    DocumentChangeOperation, DocumentChanges, GotoDefinitionResponse, Location,
-    OneOf, Position, ResourceOp, TextEdit, Url, WorkspaceEdit,
+    CodeActionResponse, CodeLens, CompletionItem, CompletionTextEdit,
+    DiagnosticSeverity, DocumentChangeOperation, DocumentChanges,
+    GotoDefinitionResponse, Location, OneOf, Position, ResourceOp, TextEdit, Url,
+    WorkspaceEdit,
 };
 use xi_rope::{Rope, RopeDelta, Transformer};
 
@@ -1130,6 +1131,18 @@ impl LapceEditorBufferData {
         self.doc.code_actions.get(&prev_offset)
     }
 
+    pub fn code_lens(
+        &self,
+    ) -> Vec<(PluginId, &CodeLens)> {
+        self.doc
+            .code_lenses
+            .iter()
+            .flat_map(|(plugin_id, lens)| {
+                lens.iter().map(|lens| (*plugin_id, lens))
+            })
+            .collect()
+    }
+
     pub fn diagnostics(&self) -> Option<&Arc<Vec<EditorDiagnostic>>> {
         self.doc.diagnostics.as_ref()
     }
@@ -2196,6 +2209,31 @@ impl LapceEditorBufferData {
                 self.save(ctx, true);
             }
             Save => {
+                if let BufferContent::File(path) = self.doc.content() {
+                    let path = path.clone();
+                    let event_sink = ctx.get_external_handle();
+                    let view_id = *self.main_split.tab_id;
+                    self.proxy.proxy_rpc.get_code_lense(
+                        path.clone(),
+                        move |result| {                            
+                            if let Ok(ProxyResponse::CodeLensResponse {
+                                items,
+                                plugin_id,
+                            }) = result
+                            {
+                                let _ = event_sink.submit_command(
+                                    LAPCE_UI_COMMAND,
+                                    LapceUICommand::UpdateCodeLens {
+                                        path,
+                                        plugin_id,
+                                        resp: items,
+                                    },
+                                    Target::Widget(view_id),
+                                );
+                            }
+                        },
+                    )
+                }
                 self.save(ctx, false);
             }
             Rename => {

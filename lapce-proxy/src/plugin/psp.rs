@@ -25,14 +25,15 @@ use lsp_types::{
         ShowMessage,
     },
     request::{
-        CodeActionRequest, CodeActionResolveRequest, Completion,
-        DocumentSymbolRequest, Formatting, GotoDefinition, GotoTypeDefinition,
-        HoverRequest, Initialize, InlayHintRequest, PrepareRenameRequest,
-        References, RegisterCapability, Rename, ResolveCompletionItem,
-        SelectionRangeRequest, SemanticTokensFullRequest, WorkDoneProgressCreate,
-        WorkspaceSymbol,
+        CodeActionRequest, CodeActionResolveRequest, CodeLensRefresh,
+        CodeLensRequest, CodeLensResolve, Completion, DocumentSymbolRequest,
+        Formatting, GotoDefinition, GotoTypeDefinition, HoverRequest, Initialize,
+        InlayHintRequest, PrepareRenameRequest, References, RegisterCapability,
+        Rename, ResolveCompletionItem, SelectionRangeRequest,
+        SemanticTokensFullRequest, WorkDoneProgressCreate, WorkspaceSymbol,
     },
-    CodeActionProviderCapability, DidChangeTextDocumentParams,
+    CodeActionProviderCapability, CodeLensClientCapabilities,
+    CodeLensWorkspaceClientCapabilities, DidChangeTextDocumentParams,
     DidSaveTextDocumentParams, DocumentSelector, HoverProviderCapability,
     LogMessageParams, OneOf, ProgressParams, PublishDiagnosticsParams, Range,
     Registration, RegistrationParams, SemanticTokens, SemanticTokensLegend,
@@ -703,6 +704,12 @@ impl PluginHostHandler {
             CodeActionResolveRequest::METHOD => {
                 self.server_capabilities.code_action_provider.is_some()
             }
+            CodeLensRequest::METHOD | CodeLensRefresh::METHOD => {
+                self.server_capabilities.code_lens_provider.is_some()
+            }
+            CodeLensResolve::METHOD =>  self.server_capabilities.code_lens_provider.as_ref()
+                .map(|provider| provider.resolve_provider.is_some())
+                .unwrap_or_default(),
             _ => false,
         }
     }
